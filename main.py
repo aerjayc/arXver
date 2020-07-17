@@ -1,22 +1,28 @@
-import requests
 import re
+import requests
 
 
-def check_archive_today(url,
-                        domain="archive.md",
-                        user_agent="arXver/0.1.0"):
+def get_first_archive_today(url,
+                            domain="archive.md",
+                            user_agent="arXver/0.2.0"):
+    """Return URL of the first and last archive in archive.today.
+
+    If `url` is an invalid URL, the function raises an AssertionError.
+    If archive.today responds with status code 404, the function returns False.
+    Else, if a memento is found, it returns the URL of the earliest one.
+    If none are found, it returns None.
     """
-    Checks if the url is already archived in archive.md
-    """
+
     # validate url
+    assert validate_url(url), f'Invalid URL: "{url}"'
 
     # get timegate url (use HEAD request)
-    archive_today_url = f"http://{domain}/timegate/{url}"
+    timegate_url = f'http://{domain}/timegate/{url}'
 
     headers = {'User-Agent': user_agent}
 
-    response = requests.head(archive_today_url, headers=headers)
-    if response == 404:
+    response = requests.head(timegate_url, headers=headers)
+    if response.status_code == 404:
         return False
 
     # parse response to get first memento
@@ -26,21 +32,21 @@ def check_archive_today(url,
 
     if 'first memento' in links:
         return links['first memento']
-    elif 'first last memento' in links:
+
+    if 'first last memento' in links:   # when there is only 1 memento
         return links['first last memento']
-    else:
-        for rel, url in links:
-            if 'memento' in rel:
-                return links[rel]
+
+    for rel, archive_url in links.items():
+        # in case there is a `rel` with substring 'memento' aside from above
+        if 'memento' in rel:
+            return archive_url
 
     return None
 
 
 def link_header_parser(string):
-    """
-    Parses the Link header, according to the spec:
-    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link
-    """
+    """Parse Link header field."""
+
     exp = re.compile(r'<(\S+)>;\s*rel="([^"]+)",?\s*')
 
     # if want to catch "'" users, use this:
@@ -50,3 +56,21 @@ def link_header_parser(string):
 
     return dict((rel, url) for url, rel in matches)
 
+
+def validate_url(string):
+    """Return True if `string` is a valid url, else return False.
+
+    Based on https://stackoverflow.com/a/7160778/11905538
+    """
+
+    regex = re.compile(
+        r'^(?:http|ftp)s?://'   # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+'
+        r'(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+        r'localhost|'           # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'            # optional port
+        r'(?:/?|[/?]\S+)$',
+        re.IGNORECASE)
+
+    return re.match(regex, string) is not None
