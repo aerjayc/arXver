@@ -1,7 +1,7 @@
 import requests
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from archive_today import validate_url
+from utils import validate_url
 
 
 def get_fast_wayback_machine(url,
