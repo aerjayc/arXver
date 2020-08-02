@@ -34,4 +34,4 @@ def get_fast_wayback_machine(url,
                   }
     response = sess.get(wayback_endpoint, **get_kwargs)
 
-    return response
+    return response.json()
