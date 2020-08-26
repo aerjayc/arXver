@@ -2,7 +2,7 @@ from wayback_machine import get_fast_wayback_machine
 import time
 
 
-def check_urls(urls):
+def check_urls(urls, sleep_duration=5):
 
     for url in urls:
         print(f"{url} - ", end="", flush=True)
@@ -14,6 +14,4 @@ def check_urls(urls):
             # archive it
             print(f"❌ ")
 
-        time.sleep(3)
-
-    return archive
+        time.sleep(sleep_duration)
