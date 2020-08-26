@@ -1,13 +1,11 @@
 import re
 
-URL_RAW_REGEX = (r'^(?:http|ftp)s?://'     # http:// or https://
-                 r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+'
-                 r'(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'    # domain...
-                 r'localhost|'            # localhost...
-                 r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'    # ...or ip
-                 r'(?::\d+)?'             # optional port
-                 r'(?:/?|[/?]\S+)$')
-
+# from https://stackoverflow.com/a/29288898
+URL_RAW_REGEX = (r"(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)"
+                 r"(?:\([-A-Z0-9+&@#/%=~_|$?!:,.]*\)|"
+                 r"[-A-Z0-9+&@#/%=~_|$?!:,.])*"
+                 r"(?:\([-A-Z0-9+&@#/%=~_|$?!:,.]*\)|"
+                 r"[A-Z0-9+&@#/%=~_|$])")
 
 
 def link_header_parser(string):
@@ -24,12 +22,20 @@ def link_header_parser(string):
 
 
 def validate_url(string):
-    """Return True if `string` is a valid url, else return False.
+    """Return True if `string` is a valid url, else return False."""
 
-    Based on https://stackoverflow.com/a/7160778/11905538
-    """
-
-    regex = re.compile(URL_RAW_REGEX, re.IGNORECASE)
+    regex = re.compile("^" + URL_RAW_REGEX + "$", re.IGNORECASE)
 
     return re.match(regex, string) is not None
+
+def extract_urls(fname):
+    """Returns a list of all urls in a file given its filename"""
+
+    pattern = re.compile(URL_RAW_REGEX, re.IGNORECASE)
+    urls = []
+    with open(fname, 'r') as f:
+        for line in f.readlines():
+            urls.extend(re.findall(pattern, line))
+
+    return urls
 
