@@ -5,8 +5,7 @@ from requests.adapters import HTTPAdapter
 from utils import validate_url
 
 
-# WARNING: This doesn't work sometimes (most probably for newly-saved stuff)
-def get_fast_wayback_machine(url,
+def get_fast_wayback_machine(url, fastLatest=False,
                              user_agent="arXver/0.3.0"):
     """Return a dict of archive URLS and metadata."""
 
@@ -16,7 +15,7 @@ def get_fast_wayback_machine(url,
     # get fast url
     wayback_endpoint = 'http://web.archive.org/cdx/search/cdz'
     params = {'url': url,
-              'fastLatest': True,
+              'fastLatest': fastLatest,
               'output': 'json'
               }
 
