@@ -1,9 +1,11 @@
 import requests
+import urllib.parse
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from utils import validate_url
 
 
+# WARNING: This doesn't work sometimes (most probably for newly-saved stuff)
 def get_fast_wayback_machine(url,
                              user_agent="arXver/0.3.0"):
     """Return a dict of archive URLS and metadata."""
@@ -35,3 +37,16 @@ def get_fast_wayback_machine(url,
     response = sess.get(wayback_endpoint, **get_kwargs)
 
     return response.json()
+
+def submit_wayback_archive(url,
+                           user_agent="arXver/0.3.0"):
+
+    # validate url
+    assert validate_url(url), f'Invalid URL: "{url}"'
+
+    submission_url = f'http://web.archive.org/save/{url}'
+    headers = {'User-Agent': user_agent}
+    response = requests.get(submission_url, headers=headers)
+
+    return response
+
