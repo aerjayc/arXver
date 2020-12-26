@@ -2,15 +2,15 @@ import requests
 import urllib.parse
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from utils import validate_url
+from . import utils
+from . import user_agent
 
 
-def get_fast_wayback_machine(url, fastLatest=False, limit=None,
-                             user_agent="arXver/0.3.0"):
+def query_wayback(url, fastLatest=False, limit=None, user_agent=user_agent):
     """Return a dict of archive URLS and metadata."""
 
     # validate url
-    assert validate_url(url), f'Invalid URL: "{url}"'
+    assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
     # get fast url
     wayback_endpoint = 'http://web.archive.org/cdx/search/cdz'
@@ -39,11 +39,10 @@ def get_fast_wayback_machine(url, fastLatest=False, limit=None,
 
     return response.json()
 
-def submit_wayback_archive(url,
-                           user_agent="arXver/0.3.0"):
+def submit_wayback(url, user_agent=user_agent):
 
     # validate url
-    assert validate_url(url), f'Invalid URL: "{url}"'
+    assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
     submission_url = f'http://web.archive.org/save/{url}'
     headers = {'User-Agent': user_agent}
@@ -51,3 +50,5 @@ def submit_wayback_archive(url,
 
     return response
 
+def submit_unarchived(url, user_agent=user_agent):
+    pass
