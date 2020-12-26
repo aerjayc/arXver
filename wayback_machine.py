@@ -13,7 +13,7 @@ def query_wayback(url, fastLatest=False, limit=None, user_agent=user_agent):
     assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
     # get fast url
-    wayback_endpoint = 'http://web.archive.org/cdx/search/cdz'
+    wayback_endpoint = 'http://web.archive.org/cdx/search/cdx'
     params = {'url': url,
               'fastLatest': fastLatest,
               'output': 'json'
@@ -71,5 +71,5 @@ def submit_if_unarchived(url):
     response = submit_wayback(url)
     response.raise_for_status()
 
-    return response
+    return response.url, response.content
 
