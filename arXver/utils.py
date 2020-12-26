@@ -1,4 +1,5 @@
 import re
+from urllib.parse import urlparse
 
 # from https://stackoverflow.com/a/29288898
 URL_RAW_REGEX = (r"(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)"
@@ -39,3 +40,30 @@ def extract_urls(fname):
 
     return urls
 
+def url_to_filename(url, extension=None, sep=' ', ignore_fragment=False):
+    """Converts a URL to a legal filename"""
+
+    parsed = urlparse(url)
+
+    # strip protocol and www.
+    if parsed.netloc.startswith('www.'):
+        filename = parsed.netloc[4:]
+    else:
+        filename = parsed.netloc
+
+    filename += parsed.path + parsed.params + parsed.query
+    if not ignore_fragment:
+        filename += parsed.fragment
+
+    filename = re.sub(r'[\/:*"<>|]', sep, filename)
+    filename = re.sub(rf'\{sep}' + '{2,}', sep, filename)    # remove extra `sep`s
+    # TODO: remove only the `sep`s that were introduced, and not those from the
+    #       original string
+
+    filename = filename.strip()
+    if extension:
+        if not extension.startswith('.'):
+            filename += '.'
+        filename += extension
+
+    return filename
