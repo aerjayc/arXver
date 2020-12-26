@@ -6,7 +6,8 @@ from . import utils
 from . import user_agent
 
 
-def query_wayback(url, fastLatest=False, limit=None, user_agent=user_agent):
+def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
+                  user_agent=user_agent):
     """Return a dict of archive URLS and metadata."""
 
     # validate url
@@ -20,6 +21,8 @@ def query_wayback(url, fastLatest=False, limit=None, user_agent=user_agent):
               }
     if limit:
         params['limit'] = limit
+    if statuscode:
+        params['statuscode'] = statuscode
 
     # create Session
     # based on https://stackoverflow.com/a/35504626/11905538
@@ -66,7 +69,8 @@ def submit_wayback(url, user_agent=user_agent):
 def submit_if_unarchived(url):
     results = query_wayback(url, limit=5)
     if results:
-        return results
+        # convert results to url
+        return results, None
 
     response = submit_wayback(url)
     response.raise_for_status()
