@@ -36,8 +36,15 @@ def query_wayback(url, fastLatest=False, limit=None, user_agent=user_agent):
                   'headers': {'User-Agent': user_agent}
                   }
     response = sess.get(wayback_endpoint, **get_kwargs)
+    response.raise_for_status()
 
-    return response.json()
+    results = []
+    if response.json():
+        column_names = response.json()[0]
+        for row in response.json()[1:]:
+            results.append(dict(zip(column_names, row)))
+
+    return results
 
 def submit_wayback(url, user_agent=user_agent):
 
@@ -47,8 +54,22 @@ def submit_wayback(url, user_agent=user_agent):
     submission_url = f'http://web.archive.org/save/{url}'
     headers = {'User-Agent': user_agent}
     response = requests.get(submission_url, headers=headers)
+    if response.status_code == 523:
+        print('Status Code 523: Origin Is Unreachable.',
+              'Maybe', url, 'is down?')
+        return None
+
+    response.raise_for_status()
 
     return response
 
-def submit_unarchived(url, user_agent=user_agent):
-    pass
+def submit_if_unarchived(url):
+    results = query_wayback(url, limit=5)
+    if results:
+        return results
+
+    response = submit_wayback(url)
+    response.raise_for_status()
+
+    return response
+
