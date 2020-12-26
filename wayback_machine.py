@@ -5,7 +5,7 @@ from requests.adapters import HTTPAdapter
 from utils import validate_url
 
 
-def get_fast_wayback_machine(url, fastLatest=False,
+def get_fast_wayback_machine(url, fastLatest=False, limit=None,
                              user_agent="arXver/0.3.0"):
     """Return a dict of archive URLS and metadata."""
 
@@ -18,6 +18,8 @@ def get_fast_wayback_machine(url, fastLatest=False,
               'fastLatest': fastLatest,
               'output': 'json'
               }
+    if limit:
+        params['limit'] = limit
 
     # create Session
     # based on https://stackoverflow.com/a/35504626/11905538
