@@ -1,6 +1,5 @@
 import requests
-from utils import validate_url, link_header_parser
-
+from . import utils
 
 def get_first_archive_today(url,
                             domain="archive.md",
@@ -14,7 +13,7 @@ def get_first_archive_today(url,
     """
 
     # validate url
-    assert validate_url(url), f'Invalid URL: "{url}"'
+    assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
     # get timegate url (use HEAD request)
     timegate_url = f'http://{domain}/timegate/{url}'
@@ -26,7 +25,7 @@ def get_first_archive_today(url,
         return False
 
     # parse response to get first memento
-    links = link_header_parser(response.headers['Link'])
+    links = utils.link_header_parser(response.headers['Link'])
     if not links:
         return None
 
