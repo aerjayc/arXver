@@ -14,7 +14,7 @@ def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
     assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
     # get fast url
-    wayback_endpoint = 'http://web.archive.org/cdx/search/cdx'
+    wayback_endpoint = 'https://web.archive.org/cdx/search/cdx'
     params = {'url': url,
               'fastLatest': fastLatest,
               'output': 'json'
@@ -46,7 +46,7 @@ def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
         column_names = response.json()[0]
         for row in response.json()[1:]:
             result = dict(zip(column_names, row))
-            archive_url = (f"http://web.archive.org/web/{result['timestamp']}/"
+            archive_url = (f"https://web.archive.org/web/{result['timestamp']}/"
                           + result['original'])
             results.append((archive_url, result['statuscode']))
 
@@ -57,7 +57,7 @@ def submit_wayback(url, user_agent=user_agent):
     # validate url
     assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
-    submission_url = f'http://web.archive.org/save/{url}'
+    submission_url = f'https://web.archive.org/save/{url}'
     headers = {'User-Agent': user_agent}
     response = requests.get(submission_url, headers=headers)
     if response.status_code == 523:
