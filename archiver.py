@@ -1,12 +1,14 @@
 from pyarchiver import wayback_machine
 from pyarchiver import utils
+from . import user_agent, common_user_agent
 import os.path
 from pathlib import Path
 import time
+import argparse
 
 
-def submit_unarchived(urls, save_dir=None, overwrite=False,
-                      query_pause=2, submit_pause=5):
+def submit_unarchived(urls, save_dir=None, overwrite=False, query_pause=2,
+                      submit_pause=5, user_agent=user_agent):
 
     if save_dir is not None:
         print(save_dir, 'does not exist. Creating directory...')
@@ -15,14 +17,15 @@ def submit_unarchived(urls, save_dir=None, overwrite=False,
     archived_urls = dict()
     for url in urls:
         print(url, '- ', end='', flush=True)
-        results = wayback_machine.query_wayback(url, fastLatest=True, limit=1, statuscode=200)
+        results = wayback_machine.query_wayback(url, limit=-1, statuscode=200,
+                                                user_agent=user_agent)
         time.sleep(query_pause)
         if results:
             archived_urls[url] = results[0][0]
             print('Already archived at', archived_urls[url])
             continue
 
-        response = wayback_machine.submit_wayback(url)
+        response = wayback_machine.submit_wayback(url, user_agent=user_agent)
         time.sleep(submit_pause)
         archived_urls[url] = response.url
         print('Submitted to', response.url)
@@ -39,3 +42,20 @@ def submit_unarchived(urls, save_dir=None, overwrite=False,
             print('\tSaved page to', filepath)
 
     return archived_urls
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('urls_file', help='file containing urls to archive')
+    parser.add_argument('-s', '--save', help='where to save the raw htmls')
+    parser.add_argument('-f', '--force', help='overwrite file if it exists')
+    parser.add_argument('-u', '--user_agent')
+    parser.add_argument('--spoof', action='store_true',  help='use a common user agent')
+    args = parser.parse_args()
+
+    if args.spoof:
+        user_agent = common_user_agent
+    urls = utils.extract_urls(args.urls_file)
+
+    submit_unarchived(urls, save_dir=args.save, overwrite=args.force, user_agent=user_agent)
+
