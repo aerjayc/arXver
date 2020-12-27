@@ -69,14 +69,3 @@ def submit_wayback(url, user_agent=user_agent):
 
     return response
 
-def submit_if_unarchived(url):
-    results = query_wayback(url, limit=5)
-    if results:
-        # convert results to url
-        return results, None
-
-    response = submit_wayback(url)
-    response.raise_for_status()
-
-    return response.url, response.content
-
