@@ -1,6 +1,5 @@
-from pyarchiver import wayback_machine
-from pyarchiver import utils
-from . import user_agent, common_user_agent
+from pyarchiver import wayback_machine, utils
+from pyarchiver import user_agent, common_user_agent
 import os.path
 from pathlib import Path
 import time
