@@ -45,7 +45,10 @@ def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
     if response.json():
         column_names = response.json()[0]
         for row in response.json()[1:]:
-            results.append(dict(zip(column_names, row)))
+            result = dict(zip(column_names, row))
+            archive_url = (f"http://web.archive.org/web/{result['timestamp']}/"
+                          + result['original'])
+            results.append((archive_url, result['statuscode']))
 
     return results
 
