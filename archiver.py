@@ -1,5 +1,5 @@
-from arXver import wayback_machine
-from arXver import utils
+from pyarchiver import wayback_machine
+from pyarchiver import utils
 import os.path
 from pathlib import Path
 import time
