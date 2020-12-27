@@ -22,7 +22,7 @@ def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
     if limit:
         params['limit'] = limit
     if statuscode:
-        params['statuscode'] = statuscode
+        params['filter'] = f'statuscode:{statuscode}'
 
     # create Session
     # based on https://stackoverflow.com/a/35504626/11905538
