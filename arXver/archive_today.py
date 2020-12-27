@@ -1,9 +1,10 @@
 import requests
 from . import utils
+from . import user_agent
 
 def get_first_archive_today(url,
                             domain="archive.md",
-                            user_agent="arXver/0.2.0"):
+                            user_agent=user_agent):
     """Return URL of the first and last archive in archive.today.
 
     If `url` is an invalid URL, the function raises an AssertionError.
