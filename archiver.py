@@ -13,7 +13,7 @@ def submit_unarchived(urls, save_dir=None, overwrite=False, force=False,
         Path(save_dir).mkdir(parents=True, exist_ok=True)
 
     archived_urls = dict()
-    for url in urls:
+    for i, url in enumerate(urls):
         print(url, '- ', end='', flush=True)
         results = wayback_machine.query_wayback(url, limit=-1, statuscode=200,
                                                 user_agent=user_agent)
@@ -28,7 +28,8 @@ def submit_unarchived(urls, save_dir=None, overwrite=False, force=False,
         response = wayback_machine.submit_wayback(url, user_agent=user_agent)
         archived_urls[url] = response.url
         print('Submitted to', response.url)
-        time.sleep(submit_pause)
+        if i < (len(urls) - 1):     # don't sleep after the last url
+            time.sleep(submit_pause)
 
         if save_dir is not None:
             filename = utils.url_to_filename(url, extension='.html')
