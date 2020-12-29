@@ -29,14 +29,23 @@ def validate_url(string):
 
     return re.match(regex, string) is not None
 
-def extract_urls(fname):
+def extract_urls(string):
+    """Returns a list of all urls in a string"""
+
+    pattern = re.compile(URL_RAW_REGEX, re.IGNORECASE)
+    urls = []
+    for word in string.split():
+        urls.extend(re.findall(pattern, word))
+
+    return urls
+
+def extract_urls_from_file(fname):
     """Returns a list of all urls in a file given its filename"""
 
     pattern = re.compile(URL_RAW_REGEX, re.IGNORECASE)
     urls = []
     with open(fname, 'r') as f:
-        for line in f.readlines():
-            urls.extend(re.findall(pattern, line))
+        urls.extend(extract_urls(f.read()))
 
     return urls
 
