@@ -10,7 +10,6 @@ def submit_unarchived(urls, save_dir=None, overwrite=False, force=False,
                       query_pause=2, submit_pause=5, user_agent=user_agent):
 
     if save_dir is not None:
-        print(save_dir, 'does not exist. Creating directory...')
         Path(save_dir).mkdir(parents=True, exist_ok=True)
 
     archived_urls = dict()
@@ -54,6 +53,8 @@ if __name__ == '__main__':
                         help='submit url even if already archived')
     parser.add_argument('-w', '--overwrite', action='store_true',
                         help='overwrite file if it exists')
+    parser.add_argument('-t', '--time_delay', metavar='SECS', default=5, type=int,
+                        help='time delay between archive submissions')
     parser.add_argument('-u', '--user_agent')
     parser.add_argument('--spoof', action='store_true',  help='use a common user agent')
     args = parser.parse_args()
@@ -62,6 +63,7 @@ if __name__ == '__main__':
         user_agent = common_user_agent
     urls = utils.extract_urls(args.urls_file)
 
-    submit_unarchived(urls, save_dir=args.save, force=args.force,
-                      overwrite=args.overwrite, user_agent=user_agent)
+    submit_unarchived(urls, save_dir=args.save, submit_pause=args.time_delay,
+                      force=args.force, overwrite=args.overwrite,
+                      user_agent=user_agent)
 
