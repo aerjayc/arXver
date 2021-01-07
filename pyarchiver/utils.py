@@ -1,12 +1,13 @@
 import re
 from urllib.parse import urlparse
 
-# from https://stackoverflow.com/a/29288898
-URL_RAW_REGEX = (r"(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)"
-                 r"(?:\([-A-Z0-9+&@#/%=~_|$?!:,.]*\)|"
-                 r"[-A-Z0-9+&@#/%=~_|$?!:,.])*"
-                 r"(?:\([-A-Z0-9+&@#/%=~_|$?!:,.]*\)|"
-                 r"[A-Z0-9+&@#/%=~_|$])")
+# from https://stackoverflow.com/a/7160778
+URL_RAW_REGEX = (r'(?:http|ftp)s?://' # http:// or https://
+                 r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+                 r'localhost|' #localhost...
+                 r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+                 r'(?::\d+)?' # optional port
+                 r'(?:/?|[/?]\S+)')
 
 
 def link_header_parser(string):
