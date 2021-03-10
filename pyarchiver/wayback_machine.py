@@ -52,14 +52,18 @@ def query_wayback(url, fastLatest=False, limit=None, statuscode=None,
 
     return results
 
-def submit_wayback(url, user_agent=user_agent):
+def submit_wayback(url, user_agent=user_agent, session=None):
 
     # validate url
     assert utils.validate_url(url), f'Invalid URL: "{url}"'
 
-    submission_url = f'https://web.archive.org/save/{url}'
+    if session is None:
+        session = requests.Session()
+
+    base_url = 'https://web.archive.org/web/'
+    payload = {'url_preload': url}
     headers = {'User-Agent': user_agent}
-    response = requests.get(submission_url, headers=headers)
+    response = session.post(base_url, data=payload, headers=headers)
     if response.status_code == 523:
         print('Status Code 523: Origin Is Unreachable.',
               'Maybe', url, 'is down?')
