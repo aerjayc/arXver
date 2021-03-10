@@ -1,13 +1,8 @@
 import re
 from urllib.parse import urlparse
 
-# from https://stackoverflow.com/a/7160778
-URL_RAW_REGEX = (r'(?:http|ftp)s?://' # http:// or https://
-                 r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-                 r'localhost|' #localhost...
-                 r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-                 r'(?::\d+)?' # optional port
-                 r'(?:/?|[/?]\S+)')
+# from https://stackoverflow.com/a/6041965/15116703 (modified)
+URL_RAW_REGEX = "(?P<protocol>http|ftp|https)(://(?:www\.)?)(?P<domain>[\w_-]+(?:(?:\.[\w_-]+)+))(?P<relpath>[\w.,@?^=%&:/~+#*\-]*[\w@?^=%&/~+#-])?"
 
 
 def link_header_parser(string):
@@ -44,9 +39,13 @@ def extract_urls_from_file(fname):
     """Returns a list of all urls in a file given its filename"""
 
     pattern = re.compile(URL_RAW_REGEX, re.IGNORECASE)
-    urls = []
+    urls = {}
     with open(fname, 'r') as f:
-        urls.extend(extract_urls(f.read()))
+        for url in extract_urls(f.read()):
+            domain = url[2]
+            if domain not in urls:
+                urls[domain] = []
+            urls[domain].append(''.join(url))
 
     return urls
 
