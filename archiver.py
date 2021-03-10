@@ -49,7 +49,7 @@ def submit_unarchived(urls, output_dir=None, overwrite=False, force=False,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', metavar='FILE', dest='input',
-                        help='file containing urls to archive (overrides pipe input)')
+                        help='file containing urls to archive (overrides pipe input), whitespace-separated')
     parser.add_argument('-o', '--output', metavar='DIRECTORY',
                         help='output directory for the raw htmls')
     parser.add_argument('-f', '--force', action='store_true',
@@ -63,15 +63,20 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.input:
-        urls = utils.extract_urls_from_file(args.input)
+        with open(args.input, 'r') as f:
+            raw_input = f.read()
     elif not sys.stdin.isatty():
-        urls = utils.extract_urls(sys.stdin.read())
+        raw_input = sys.stdin.read()
     else:
         parser.print_usage()
         exit()
 
+    urls = raw_input.split()
+
     if args.spoof:
         user_agent = common_user_agent
+        print(f'Using "{user_agent}" as user agent.')
+    print("URLS:", urls)
 
     submit_unarchived(urls, output_dir=args.output, submit_pause=args.time_delay,
                       force=args.force, overwrite=args.overwrite,
